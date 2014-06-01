@@ -145,17 +145,22 @@ int main() {
 		} else if (input[i] == ' ') {
 			
 			//if the chunk count is set to zero it means that no chunk form 0-9 was processed
-			//so the last chunk must have been a '.' or a 'R' etc which has already been printe out.
-			//so simple continue the input loop from the start.
+			//so the last chunk must have been a '.' or 'R' etc which has already been processed above.
+			//so simply continue the input loop from the start. (' ' is a poor choice to denote the
+			//end of a chunk)
 
 			if (j == 0) {
 				
 				continue;
 			}
 
-			chunk[j] = '\0';//null byte to make sure the chunk integer string is correctly terminated
-			j = 0;//reset chunk index count for the next chunk
+			//null byte to make sure the chunk integer string is correctly terminated
+			chunk[j] = '\0';
 			
+			//reset chunk index count for the next chunk
+			j = 0;
+		
+			//convert chunk string into a int to use as an array index
 			int index = atoi(chunk);
 			
 			//if the last chunk was 0-9 then it needs a space because a 0-9 chuck is a index to a word.

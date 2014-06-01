@@ -92,55 +92,93 @@ I do not like them here or there.
 I do not like them anywhere.
 I do not like green eggs and ham.
 I do not like them, Sam-I-am.
-
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define SIZE = 8 // chunk size
+#define SIZE 8 // chunk size
 
-char *dictionary[] = {"i",
-			"do",
-			"house",
-			"with",
-			"mouse",
-			"in",
-			"not",
-			"like",
-			"them",
-			"ham",
-			"a",
-			"anywhere",
-			"green",
-			"eggs",
-			"and",
-			"here",
-			"or",
-			"there",
-			"sam",
-			"am"};
+char *dictionary[] = {"i","do","house","with","mouse","in","not","like","them","ham","a","anywhere","green","eggs","and","here","or","there","sam","am"};
 
-char input[] = {"0^ 1 6 7 8 5 10 2 . R \
-			0^ 1 6 7 8 3 10 4 . R \
-			0^ 1 6 7 8 15 16 17 . R \
-			0^ 1 6 7 8 11 . R \
-			0^ 1 6 7 12 13 14 9 . R \
-			0^ 1 6 7 8 , 18^ - 0^ - 19 . R E"};
+char input[] = {"0^ 1 6 7 8 5 10 2 . R 0^ 1 6 7 8 3 10 4 . R 0^ 1 6 7 8 15 16 17 . R 0^ 1 6 7 8 11 . R 0^ 1 6 7 12 13 14 9 . R 0^ 1 6 7 8 , 18^ - 0^ - 19 . R E"};
 
 char chunk[SIZE];
 
 int main() {
 	
 	int i;
-
+	int j = 0;
+	
 	int size = sizeof(input);
 	
 	for (i =0; i < size; i++) {
+			
+		if(input[i] >= '0' && input[i] <= '9') {
+				
+			chunk[j] = input[i];
+			j++;
 		
-		printf("%c", input[i]);
+		// R indicates a new line
+		} else if (input[i] == 'R') {
+
+			printf("\n");
+			continue;
+
+		} else if (input[i] == '.') {
+		
+			printf(".");
+			continue;
+		
+		} else if (input[i] == '-') {
+		
+			printf("-");
+			continue;
+
+		} else if (input[i] == ',') {
+		
+			printf(", ");
+			continue;
+
+		//end if chunk reached
+		} else if (input[i] == ' ') {
+			
+			//if the chunk count is set to zero it means that no chunk form 0-9 was processed
+			//so the last chunk must have been a '.' or a 'R' etc which has already been printe out.
+			//so simple continue the input loop from the start.
+
+			if (j == 0) {
+				
+				continue;
+			}
+
+			chunk[j] = '\0';//null byte to make sure the chunk integer string is correctly terminated
+			j = 0;//reset chunk index count for the next chunk
+			
+			int index = atoi(chunk);
+			
+			//if the last chunk was 0-9 then it needs a space because a 0-9 chuck is a index to a word.
+			if (input[i - 1] >= '0' && input[i - 1] <= '9') {
+				
+				printf(" ");
+			}
+
+			//check to see if we must capitilise the first letter of this chunk
+			if(input[i - 1] == '^') {
+				
+				char temp[256];
+				
+				strcpy(temp, dictionary[index]);
+				temp[0] = temp[0] - 32;
+				printf("%s", temp);
+			
+			} else {
+
+				printf("%s", dictionary[index]);
+			}
+		}
 	}
 
-	printf("\n");
-	
 	return 0;
 }

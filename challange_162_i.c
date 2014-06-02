@@ -126,9 +126,6 @@ anywhere
 
 char input[] = "I would not, could not, in the rain.\nNot in the dark. Not on a train.\nNot in a car. Not in a tree.\nI do not like them, Sam, you see.\nNot in a house. Not in a box.\nNot with a mouse. Not with a fox.\nI will not eat them here or there.\nI do not like them anywhere!";
 
-//tempoary string to hold the current word being processed from the input
-char temp_word[MAX];
-
 //a 2D array of MAX elements holding a string of MAX length
 char dictionary[MAX][MAX];
 
@@ -144,7 +141,6 @@ int duplicate_check(char word[]) {
 		
 		if(val == 0) {
 			
-			printf("%d ", i);
 			return 0;//string found
 		}
 	}
@@ -154,63 +150,31 @@ int duplicate_check(char word[]) {
 
 int main() {
 	
-	//input index
-	int i;
+	char *word;
+	const char d[] = " ,.\n";
+	int i = 0;
 	
-	//temp_word index
-	int j = 0;
+	word = strtok (input, d);
 	
-	//dictionary index
-	int k = 0;
-
-	int size = sizeof(input);
-	
-	for (i = 0; i < size; i++) {
-		
-		//end of a word found
-		if(input[i] == ' ' || input[i] == '\n' || input[i] == '\0' ) {
-		
-			//terminate the tempoary word string
-			temp_word[j] = '\0';
-			j = 0;
-
-			int val = duplicate_check(temp_word);
-			
-			//processed word is not a duplicate, add it to the dictionary
-			if (val == 1) {
-
-				//printf("%s\n",temp_word);
-				printf("%d ", k);
-
-				//save processed word to the dictionary array
-				strcpy(dictionary[k], temp_word);
-				k++;
-
-				//current input char is a ' ', '\n' or '/0' char which we have determind 
-				//is the end of a word. process it and continue to the next input char.
-				switch(input[i]) {
-			
-					case '\n':
-						printf("R ");
-						continue;
-			
-					case '\0':
-						printf("E\n");
-						continue;
-
-					default:
-						continue;
-				}
-			}
-		
-		//word has been found, add each char to a tempoary string variable
-		} else if ((input[i] >= 'A' && input[i] <= 'Z') || (input[i] >= 'a' && input[i] <= 'z')) {
-
-			//build the word from the input one char at a time and convert each char to lowercase
-			temp_word[j] = tolower(input[i]);
-			j++;
+	while (word != NULL){
+    		
+		//if upper case
+		if(isupper(word[0])) {
+				
+			word[0] = tolower(word[0]);
 		}
-	}
 
+		//not a duplicate so add it to the dictionary
+		if (duplicate_check(word) == 1) {
+
+			printf ("%s\n", word);
+			
+			strcpy(dictionary[i], word);
+			i++;
+		}
+
+		word = strtok (NULL, d);
+	}		
+	
 	return 0;
 }

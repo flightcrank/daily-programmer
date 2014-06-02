@@ -120,6 +120,7 @@ anywhere
 
 #include <stdio.h>
 #include <string.h>//strcpy()
+#include <ctype.h>//strcpy()
 
 #define MAX 256
 
@@ -132,7 +133,23 @@ char temp_word[MAX];
 char dictionary[MAX][MAX];
 
 //check to see that the same word is already in the dictonary array
-int duplicate_check() {
+int duplicate_check(char word[]) {
+
+	int i;
+
+	//loop through dictionary array
+	for (i = 0; i < MAX; i++) {
+		
+		int val = strcmp(word, dictionary[i]);
+		
+		if(val == 0) {
+			
+			printf("%d ", i);
+			return 0;//string found
+		}
+	}
+
+	return 1;//string not found
 }
 
 int main() {
@@ -151,32 +168,49 @@ int main() {
 	for (i = 0; i < size; i++) {
 		
 		//end of a word found
-		if(input[i] == ' ' || input[i] == '\n') {
-			
+		if(input[i] == ' ' || input[i] == '\n' || input[i] == '\0' ) {
+		
 			//terminate the tempoary word string
 			temp_word[j] = '\0';
 			j = 0;
 
-			printf("%s\n",temp_word);
+			int val = duplicate_check(temp_word);
 			
-			//save processed word to the dictionary array
-			strcpy(dictionary[k], temp_word);
-			k++;
+			//processed word is not a duplicate, add it to the dictionary
+			if (val == 1) {
 
-			//current input char is a ' ' char which we have already processed as the end of a word.
-			//no need to continue processing it so start again with the next input char.
-			continue;
+				//printf("%s\n",temp_word);
+				printf("%d ", k);
+
+				//save processed word to the dictionary array
+				strcpy(dictionary[k], temp_word);
+				k++;
+
+				//current input char is a ' ', '\n' or '/0' char which we have determind 
+				//is the end of a word. process it and continue to the next input char.
+				switch(input[i]) {
+			
+					case '\n':
+						printf("R ");
+						continue;
+			
+					case '\0':
+						printf("E\n");
+						continue;
+
+					default:
+						continue;
+				}
+			}
 		
+		//word has been found, add each char to a tempoary string variable
 		} else if ((input[i] >= 'A' && input[i] <= 'Z') || (input[i] >= 'a' && input[i] <= 'z')) {
 
-			//build the word from the input one char at a time
-			temp_word[j] = input[i];
+			//build the word from the input one char at a time and convert each char to lowercase
+			temp_word[j] = tolower(input[i]);
 			j++;
 		}
-
 	}
 
-	printf("\n");
-	
 	return 0;
 }

@@ -129,52 +129,78 @@ char input[] = "I would not, could not, in the rain.\nNot in the dark. Not on a 
 //a 2D array of MAX elements holding a string of MAX length
 char dictionary[MAX][MAX];
 
-//check to see that the same word is already in the dictonary array
+//check to see if the same word is already in the dictonary 
 int duplicate_check(char word[]) {
 
 	int i;
 
-	//loop through dictionary array
 	for (i = 0; i < MAX; i++) {
 		
 		int val = strcmp(word, dictionary[i]);
 		
 		if(val == 0) {
 			
-			return 0;//string found
+			return 0;//duplicate string found
 		}
 	}
 
-	return 1;//string not found
+	return 1;//duplicate string not found
+}
+
+//create the dictionary
+void create_dictionary() {
+
+	char temp_word[MAX];
+	
+	int i;
+	int k = 0;//temp_word index
+	int j = 0;//dictionary index
+
+	int size = sizeof(input);
+
+	//build each word of the input one char at a time (strtok is to distructive on the original input string)
+	for(i = 0; i < size; i++) {	
+	
+		//end of word reached
+		if (input[i] == ' ' || input[i] == '\n' || input[i] == '\0') {
+			
+			//add null byte because end of sting has been found, reset temp_word index for the next word
+			temp_word[k] = '\0';
+			k = 0;
+			
+			//add word to dictionary if its not already in there
+			if (duplicate_check(temp_word) == 1) {
+				
+				printf("%s\n", temp_word);
+				strcpy(dictionary[j], temp_word);
+				j++;
+			}
+
+		} else if ((input[i] >= 'a' && input[i]<= 'z') || (input[i] >= 'A' && input[i] <= 'Z')) {
+			
+			//force char to lowercase
+			temp_word[k] = tolower(input[i]);
+			k++;	
+			
+		}
+
+	}
+
+
 }
 
 int main() {
 	
-	char *word;
-	const char d[] = " ,.\n";
-	int i = 0;
+	create_dictionary();
+
+	int i;
 	
-	word = strtok (input, d);
+	int size = sizeof(input);
+
+	for(i = 0; i < size; i++) {	
 	
-	while (word != NULL){
-    		
-		//if upper case
-		if(isupper(word[0])) {
-				
-			word[0] = tolower(word[0]);
-		}
-
-		//not a duplicate so add it to the dictionary
-		if (duplicate_check(word) == 1) {
-
-			printf ("%s\n", word);
-			
-			strcpy(dictionary[i], word);
-			i++;
-		}
-
-		word = strtok (NULL, d);
-	}		
+		//printf("%c", input[i]);
+	}
 	
 	return 0;
 }

@@ -124,13 +124,19 @@ anywhere
 
 #define MAX 256
 
-char input[] = "I would not, could not, in the rain.\nNot in the dark. Not on a train.\nNot in a car. Not in a tree.\nI do not like them, Sam, you see.\nNot in a house. Not in a box.\nNot with a mouse. Not with a fox.\nI will not eat them here or there.\nI do not like them anywhere!";
+char input[] = "I would not, could not, in the rain.\nNot in the dark. Not on a train.\nNot in a car. Not in a tree.\nI do not like them, Sam, you see.\nNot in a house. Not in a box.\nNot with a mouse. Not with a fox.\nI will not eat them here or there.\nI do not like them anywhere!\n";
 
 //a 2D array of MAX elements holding a string of MAX length
 char dictionary[MAX][MAX];
 
 //check to see if the same word is already in the dictonary 
 int duplicate_check(char word[]) {
+	
+	//empty string return string not found
+	if (word[0] == '\0') {
+		
+		return -1;
+	}
 
 	int i;
 
@@ -140,11 +146,11 @@ int duplicate_check(char word[]) {
 		
 		if(val == 0) {
 			
-			return 0;//duplicate string found
+			return i;//duplicate string found, return the strings index in the array
 		}
 	}
 
-	return 1;//duplicate string not found
+	return -1;//duplicate string not found
 }
 
 //create the dictionary
@@ -169,9 +175,8 @@ void create_dictionary() {
 			k = 0;
 			
 			//add word to dictionary if its not already in there
-			if (duplicate_check(temp_word) == 1) {
+			if (duplicate_check(temp_word) < 0) {
 				
-				printf("%s\n", temp_word);
 				strcpy(dictionary[j], temp_word);
 				j++;
 			}
@@ -181,26 +186,83 @@ void create_dictionary() {
 			//force char to lowercase
 			temp_word[k] = tolower(input[i]);
 			k++;	
-			
 		}
-
 	}
-
-
 }
 
 int main() {
 	
 	create_dictionary();
 
+	char temp_word[MAX];
 	int i;
+	int k;//temp_word index
 	
 	int size = sizeof(input);
 
 	for(i = 0; i < size; i++) {	
 	
-		//printf("%c", input[i]);
+		//end of word reached
+		if (input[i] == ' ' || input[i] == '\n' || input[i] == '\0') {
+			
+			//add null byte because end of sting has been found, reset temp_word index for the next word
+			temp_word[k] = '\0';
+			k = 0;
+			
+			//create copy of current word, with first char forced to lower case for
+			//comparison to dictionary which is composed of all lower case strings
+			char temp_word_lower[MAX];
+			strcpy(temp_word_lower, temp_word);
+
+			temp_word_lower[0] = tolower(temp_word[0]);
+			
+			int val = duplicate_check(temp_word_lower);
+				
+			if (val >= 0) {
+				
+				printf("%d", val);
+			}
+
+			if (isupper(temp_word[0])) {
+				
+				printf("^");
+			}
+			
+			//if input string starts with a ' ' or \n ect input array will be out of bounds eg input[-1]
+			switch (input[i - 1]) {
+
+				case ',':
+					printf(" ,");
+					break;
+
+				case '.':
+					printf(" .");
+					break;
+				
+				case '!':
+					printf(" !");
+					break;
+			}
+
+			if (input[i] == '\n') {
+
+				printf(" R");
+			}
+			
+			//print a space after each index in the dictionary and special chars
+			printf(" ");
+
+			
+		} else if ((input[i] >= 'a' && input[i]<= 'z') || (input[i] >= 'A' && input[i] <= 'Z')) {
+			
+			//case is preserved
+			temp_word[k] = input[i];
+			k++;	
+		}
+			
 	}
+		//End of input processing
+		printf("E\n");
 	
 	return 0;
 }

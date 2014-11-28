@@ -31,7 +31,7 @@ void add_to_list(char *str) {
 
 int main () {
 
-	char selection[2];
+	char selection[3];
 
 	do {
 		printf("HANGMAN !\n");
@@ -130,24 +130,65 @@ int main () {
 		
 		if (count == index) {
 			
-			printf("selected word = %s\n", current->str);
+			strcpy(str, current->str);
+			break;
 		}
 			
 		current = current->next;
 		count++;
 	}
-
-	current = &first;
-	count = 0;
 	
-	while (current->next != NULL) {
-		
-		//printf("%d: %s\n",count, current->str);
-		current = current->next;
-		count++;
-	}
-
 	printf("list count %d\n", list_count);
+	printf("selected word = %s\n", str);
+	
+	char guess[] = "0000000000";
+
+	printf("Guess char\n");
+	printf("Word :");
+	
+	int i = 0;
+	int j = 0;
+	int win = 0;
+
+	//loops for 10 guess's
+	for (i = 0; i < strlen(guess); i++) {
+	
+		win = 0;
+		
+		//loop over the length of the word to find
+		for (j = 0; j < strlen(str); j++) {
+			
+			if (strchr(guess, str[j]) != NULL) {
+				
+				printf("%c ", str[j]);
+				win++;
+
+			} else {
+				
+				printf("_ ");
+			}
+		}
+		
+		printf("win =  %d\n", win);
+		
+		if (win == strlen(str)) {
+			
+			printf("Game Won !!!\n");
+		}
+
+		fgets(selection, 10, stdin);
+
+		for (j = 0; j < strlen(guess); j++) {
+
+			if (guess[j] == '0') {
+				
+				guess[j] = selection[0];
+				break;
+			}
+		}
+
+		printf("guess's = %s\n", guess);
+	}
 
 	//free the linked list's memory
 	//free(...);

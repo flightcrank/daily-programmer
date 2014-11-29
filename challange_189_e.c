@@ -29,6 +29,25 @@ void add_to_list(char *str) {
 	current->next = NULL;
 }
 
+void clean_up() {
+
+	current = first.next;
+	struct word *temp;
+
+	//free the linked list's memory
+	while (current->next != NULL) {
+		
+		//save the adderss for the next element in the linked list
+		temp = current->next;	
+		
+		//free the memory of the current element
+		free(current);
+
+		//set the current element to the saved address of the next elemnt so it can be free'd
+		current = temp;
+	}
+}
+
 int main () {
 
 	char selection[3];
@@ -139,12 +158,9 @@ int main () {
 	}
 	
 	printf("list count %d\n", list_count);
-	printf("selected word = %s\n", str);
 	
 	char guess[] = "0000000000";
 
-	printf("Guess char\n");
-	printf("Word :");
 	
 	int i = 0;
 	int j = 0;
@@ -154,6 +170,7 @@ int main () {
 	for (i = 0; i < strlen(guess); i++) {
 	
 		win = 0;
+		printf("Word :");
 		
 		//loop over the length of the word to find
 		for (j = 0; j < strlen(str); j++) {
@@ -169,11 +186,14 @@ int main () {
 			}
 		}
 		
-		printf("win =  %d\n", win);
-		
 		if (win == strlen(str)) {
 			
-			printf("Game Won !!!\n");
+			printf("\nGame Won !!!\n");
+
+			//free the heap
+			clean_up();
+
+			return 0;
 		}
 
 		fgets(selection, 10, stdin);
@@ -188,11 +208,12 @@ int main () {
 		}
 
 		printf("guess's = %s\n", guess);
+		
 	}
+	
+	//free the heap, game not won
+	clean_up();
 
-	//free the linked list's memory
-	//free(...);
-
-	return 1;
+	return 0;
 }
 

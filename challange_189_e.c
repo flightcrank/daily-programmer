@@ -186,18 +186,22 @@ int main () {
 			}
 		}
 		
+		printf("\n");
+
 		if (win == strlen(str)) {
 			
-			printf("\nGame Won !!!\n");
+			printf("Game Won !!!\n");
 
 			//free the heap
 			clean_up();
 
 			return 0;
 		}
-
+	
+		printf("choose letter:");
 		fgets(selection, 10, stdin);
-
+		
+		//store guess's
 		for (j = 0; j < strlen(guess); j++) {
 
 			if (guess[j] == '0') {
@@ -206,11 +210,24 @@ int main () {
 				break;
 			}
 		}
+	
+		printf("\nguessed letters:");
 
-		printf("guess's = %s\n", guess);
-		
+		//print out the letters guessed so far
+		for(j = 0; j < strlen(guess); j++) {
+			
+			if(guess[j] != '0') {
+				
+				printf(" %c,", guess[j]);
+			}
+		}
+
+		printf("\n");
+
 	}
 	
+	//failed to guess in with 10 attemps
+	printf("Bad luck, word was = %s\n", str);
 	//free the heap, game not won
 	clean_up();
 

@@ -11,8 +11,13 @@ struct word {
 
 //setup linked list
 struct word first;
-struct word *current = &first;
-int list_count = -1;
+struct word *current;
+int list_count;
+
+char selection[3];
+
+//temp string to store a single line read from the word file
+char str[256];
 
 void add_to_list(char *str) {
 			
@@ -35,8 +40,16 @@ void clean_up() {
 	struct word *temp;
 
 	//free the linked list's memory
-	while (current->next != NULL) {
+	while (1) {
 		
+		//last element in linked list found.
+		if (current->next == NULL) {
+			
+			//free the memory of the current element
+			free(current);
+			break;
+		}
+
 		//save the adderss for the next element in the linked list
 		temp = current->next;	
 		
@@ -48,9 +61,7 @@ void clean_up() {
 	}
 }
 
-int main () {
-
-	char selection[3];
+int menu () {
 
 	do {
 		printf("HANGMAN !\n");
@@ -70,7 +81,7 @@ int main () {
 		} else if (selection[0] == 'q') {
 			
 			puts("bye bye!");
-			return 0;
+			return 1;
 
 		} else {
 			
@@ -78,10 +89,16 @@ int main () {
 		}
 
 	} while(selection[0] == '0');
-
-	//temp string to store a single line read from the word file
-	char str[256];
 	
+	return 0;
+}
+
+int create_list() {
+	
+	first.next = NULL;
+	current = &first;
+	list_count = -1;
+
 	//open file
 	FILE *fp = fopen("wordlist.txt", "r");
 
@@ -89,7 +106,7 @@ int main () {
 
 		puts("File not found.");
 		
-		return 0;
+		return 1;
 	}
 	
 	//loop through all lines in the file, and put them into the temp string
@@ -138,98 +155,119 @@ int main () {
 
 	//close file
 	fclose(fp);
+
+	return 0;
+}
+
+int main () {
 	
-	//select random word from list
-	int index = rand() % list_count;
-	
-	int count = 0;
-	current = &first;
-	
-	while(count <= list_count) {
-		
-		if (count == index) {
+	while(1) {
+
+		//display main menu
+		int r = menu();
+
+		if (r == 1 ) {
 			
-			strcpy(str, current->str);
-			break;
-		}
-			
-		current = current->next;
-		count++;
-	}
-	
-	printf("list count %d\n", list_count);
-	
-	char guess[] = "0000000000";
-
-	
-	int i = 0;
-	int j = 0;
-	int win = 0;
-
-	//loops for 10 guess's
-	for (i = 0; i < strlen(guess); i++) {
-	
-		win = 0;
-		printf("Word :");
-		
-		//loop over the length of the word to find
-		for (j = 0; j < strlen(str); j++) {
-			
-			if (strchr(guess, str[j]) != NULL) {
-				
-				printf("%c ", str[j]);
-				win++;
-
-			} else {
-				
-				printf("_ ");
-			}
-		}
-		
-		printf("\n");
-
-		if (win == strlen(str)) {
-			
-			printf("Game Won !!!\n");
-
-			//free the heap
-			clean_up();
-
 			return 0;
 		}
-	
-		printf("choose letter:");
-		fgets(selection, 10, stdin);
-		
-		//store guess's
-		for (j = 0; j < strlen(guess); j++) {
 
-			if (guess[j] == '0') {
+		//create a linked list of word structs
+		create_list();	
+	
+		//select random word from list
+		int index = rand() % list_count;
+	
+		int count = 0;
+		current = &first;
+	
+		while(count <= list_count) {
+		
+			if (count == index) {
 				
-				guess[j] = selection[0];
+				strcpy(str, current->str);
 				break;
 			}
-		}
-	
-		printf("\nguessed letters:");
-
-		//print out the letters guessed so far
-		for(j = 0; j < strlen(guess); j++) {
 			
-			if(guess[j] != '0') {
+			current = current->next;
+			count++;
+		}
+	
+		printf("list count %d\n", list_count);
+	
+		char guess[] = "0000000000";
+	
+		int i = 0;
+		int j = 0;
+		int win = 0;
+
+		//loops for 10 guess's
+		for (i = 0; i < strlen(guess); i++) {
+	
+			win = 0;
+			printf("Word :");
+		
+			//loop over the length of the word to find
+			for (j = 0; j < strlen(str); j++) {
+			
+				if (strchr(guess, str[j]) != NULL) {
 				
-				printf(" %c,", guess[j]);
+					printf("%c ", str[j]);
+					win++;
+
+				} else {
+				
+					printf("_ ");
+				}
 			}
+		
+			printf("\n");
+
+			if (win == strlen(str)) {
+			
+				i = strlen(guess);
+				continue;
+			}
+	
+			printf("choose letter:");
+			fgets(selection, 10, stdin);
+		
+			//store guess's
+			for (j = 0; j < strlen(guess); j++) {
+
+				if (guess[j] == '0') {
+				
+					guess[j] = selection[0];
+					break;
+				}
+			}
+	
+			printf("\nguessed letters:");
+
+			//print out the letters guessed so far
+			for(j = 0; j < strlen(guess); j++) {
+			
+				if(guess[j] != '0') {
+					
+					printf(" %c,", guess[j]);
+				}
+			}
+
+			printf("\n");
+		}
+ 	
+		if (win == strlen(str)) {
+	
+			printf("Game Won !!!\n");
+	
+		} else {
+	
+			//failed to guess in with 10 attemps
+			printf("Bad luck, word was = %s\n", str);
 		}
 
-		printf("\n");
-
+		//free the heap
+		clean_up();
 	}
-	
-	//failed to guess in with 10 attemps
-	printf("Bad luck, word was = %s\n", str);
-	//free the heap, game not won
-	clean_up();
 
 	return 0;
 }
